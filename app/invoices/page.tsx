@@ -5,7 +5,6 @@ import { motion } from "framer-motion";
 import { hoverCard, hoverTransition } from "@/lib/motion";
 import { 
   Plus, 
-  MoreVertical, 
   Edit, 
   Trash2, 
   Download, 
@@ -29,8 +28,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -422,45 +419,42 @@ export default function InvoicesPage() {
               <Card className="overflow-hidden transition-shadow duration-300 ease-out hover:shadow-2xl">
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between">
-                    <div>
+                    <div className="flex items-center gap-2">
                       <CardTitle className="text-lg flex items-center gap-2">
                         <FileText className="h-4 w-4 text-primary" /> {inv.invoiceNumber}
                       </CardTitle>
+                    </div>
+                    <div className="flex items-center gap-3">
                       <Badge
-                        className="mt-2"
                         variant={
                           inv.status === "Paid"
                             ? "default"
                             : inv.status === "Pending"
-                            ? "secondary"
-                            : "destructive"
+                              ? "secondary"
+                              : "destructive"
                         }
                       >
                         {inv.status}
                       </Badge>
-                    </div>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => handleDownloadPDF(inv)}>
-                          <Download className="mr-2 h-4 w-4" />
-                          Download PDF
-                        </DropdownMenuItem>
-                        <DropdownMenuItem 
-                          className="text-destructive"
-                          onClick={() => handleDeleteInvoice(inv.id, inv.invoiceNumber)}
+
+                      <motion.div
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteInvoice(inv.id, inv.invoiceNumber);
+                        }}
+                      >
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 rounded-full border border-destructive/30 bg-destructive/5 text-destructive hover:bg-destructive/10"
+                          title="Delete invoice"
                         >
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </motion.div>
+                    </div>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-3">
@@ -473,7 +467,7 @@ export default function InvoicesPage() {
                     <span>Due: {inv.dueDate.toLocaleDateString()}</span>
                   </div>
                   <Separator className="my-4" />
-                  <div>
+                  <div className="text-center">
                     <p className="text-xs text-muted-foreground mb-1">Amount</p>
                     <p className="text-2xl font-bold text-primary">
                       {inv.totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Dt

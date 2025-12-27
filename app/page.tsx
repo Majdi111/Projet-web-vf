@@ -1,6 +1,7 @@
 "use client"
 import React, { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
+import Image from "next/image"
 import LoginForm from "./login/LoginForm"
 import RegisterForm from "./login/RegisterForm"
 import ForgotPasswordForm from "./login/ForgotPasswordForm"
@@ -40,8 +41,18 @@ export default function LoginPage() {
         initial={{ opacity: 0, scale: 0.9, y: 40 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="w-full max-w-4xl bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 shadow-2xl flex overflow-hidden"
+        className="relative w-full max-w-4xl bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 shadow-2xl flex overflow-hidden"
       >
+        <div className="absolute left-6 bottom-6 z-30">
+          <Image
+            src="/logo.png"
+            alt="MMKR Solutions logo"
+            width={64}
+            height={64}
+            priority
+            className="h-auto w-[56px]"
+          />
+        </div>
         {/* Left Panel - Welcome Section with branding and decorative elements */}
         <div className="w-1/2 relative px-10 py-12 bg-gradient-to-br from-[#081534] via-[#0d1b47] to-[#050e27] text-white overflow-hidden">
           {/* Animated background glow effects */}

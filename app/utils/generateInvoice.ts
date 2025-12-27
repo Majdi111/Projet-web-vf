@@ -1,5 +1,7 @@
 import type { Client, Order } from "@/types/index";
 import { db } from "@/lib/firebaseClient";
+import type { jsPDF as JsPdfDoc } from "jspdf";
+import type { UserOptions as AutoTableUserOptions } from "jspdf-autotable";
 
 export type InvoicePdfOptions = {
   logoUrl?: string;
@@ -47,13 +49,11 @@ export type InvoicePdfData = {
   notes?: string;
 };
 
-const DEFAULT_LOGO_URL = "/logo.png";
+const DEFAULT_LOGO_URL = "/company/company_logo.png";
 const BRAND_GRAY: [number, number, number] = [75, 85, 99];
 const BRAND_GRAY_DARK: [number, number, number] = [31, 41, 55];
 const BORDER_GRAY: [number, number, number] = [220, 220, 220];
 const BG_SOFT: [number, number, number] = [245, 247, 250];
-const BG_SOFT_2: [number, number, number] = [240, 242, 245];
-const BG_SOFT_3: [number, number, number] = [232, 235, 240];
 const TEXT_MUTED: [number, number, number] = [107, 114, 128];
 const CURRENCY = "Dt";
 
@@ -61,7 +61,7 @@ const formatMoneyDt = (value: number) => `${Number(value || 0).toFixed(2)} ${CUR
 
 const toDateSafe = (value: unknown): Date | null => {
   if (!value) return null;
-  const date = value instanceof Date ? value : new Date(value as any);
+  const date = value instanceof Date ? value : new Date(value as string | number | Date);
   return Number.isNaN(date.getTime()) ? null : date;
 };
 
@@ -118,6 +118,28 @@ const loadImageAsDataUrl = async (url: string): Promise<string | null> => {
   }
 };
 
+const getImageAspectRatio = async (dataUrl: string): Promise<number | null> => {
+  if (typeof window === "undefined") return null;
+  try {
+    const ratio = await new Promise<number>((resolve, reject) => {
+      const img = new Image();
+      img.onerror = () => reject(new Error("Failed to load image"));
+      img.onload = () => {
+        const w = Number(img.naturalWidth || img.width || 0);
+        const h = Number(img.naturalHeight || img.height || 0);
+        if (!w || !h) return reject(new Error("Invalid image size"));
+        resolve(w / h);
+      };
+      img.src = dataUrl;
+    });
+
+    if (!Number.isFinite(ratio) || ratio <= 0) return null;
+    return ratio;
+  } catch {
+    return null;
+  }
+};
+
 const loadProductReferenceMap = async (productIds: string[]): Promise<Record<string, string>> => {
   if (typeof window === "undefined") return {};
   const uniqueIds = Array.from(new Set(productIds.filter(Boolean)));
@@ -151,7 +173,9 @@ type KeyValueRow = {
   value: string;
 };
 
-const drawSectionBox = (doc: any, params: { x: number; y: number; w: number; title: string; rows: KeyValueRow[] }) => {
+type DrawSectionBoxParams = { x: number; y: number; w: number; title: string; rows: KeyValueRow[] };
+
+const drawSectionBox = (doc: JsPdfDoc, params: DrawSectionBoxParams) => {
   const { x, y, w, title, rows } = params;
   const padX = 4;
   const padY = 4;
@@ -160,11 +184,11 @@ const drawSectionBox = (doc: any, params: { x: number; y: number; w: number; tit
   const labelW = 24;
   const valueW = w - padX * 2 - labelW;
 
-  const wrappedValues = rows.map((r) => ({
+  const wrappedValues: Array<{ label: string; valueLines: string[] }> = rows.map((r) => ({
     label: r.label,
-    valueLines: doc.splitTextToSize(String(r.value ?? "").trim() || "-", valueW),
+    valueLines: doc.splitTextToSize(String(r.value ?? "").trim() || "-", valueW) as string[],
   }));
-  const contentLines = wrappedValues.reduce((sum: number, r: any) => sum + (r.valueLines?.length ?? 1), 0);
+  const contentLines = wrappedValues.reduce((sum, r) => sum + (r.valueLines.length || 1), 0);
   const h = padY + headerH + padY + contentLines * rowGap + padY;
 
   doc.setDrawColor(BORDER_GRAY[0], BORDER_GRAY[1], BORDER_GRAY[2]);
@@ -180,7 +204,7 @@ const drawSectionBox = (doc: any, params: { x: number; y: number; w: number; tit
   doc.text(title, x + padX, y + 6.3);
 
   let cursorY = y + headerH + padY + 2;
-  wrappedValues.forEach((r: any) => {
+  wrappedValues.forEach((r) => {
     doc.setFont("helvetica", "bold");
     doc.setFontSize(8.8);
     doc.setTextColor(TEXT_MUTED[0], TEXT_MUTED[1], TEXT_MUTED[2]);
@@ -189,7 +213,7 @@ const drawSectionBox = (doc: any, params: { x: number; y: number; w: number; tit
     doc.setFont("times", "normal");
     doc.setFontSize(9.2);
     doc.setTextColor(20, 20, 20);
-    (r.valueLines as string[]).forEach((line, idx) => {
+    r.valueLines.forEach((line, idx) => {
       doc.text(String(line), x + padX + labelW, cursorY + idx * rowGap);
     });
 
@@ -206,7 +230,9 @@ export async function generateInvoicePDF(arg1: unknown, arg2?: unknown, arg3?: u
   if (typeof window === "undefined") return;
 
   const isClientOrderCall = Boolean(arg2) && typeof arg2 === "object";
-  const options: InvoicePdfOptions | undefined = (isClientOrderCall ? (arg3 as any) : (arg2 as any)) ?? undefined;
+  const optionsCandidate = isClientOrderCall ? arg3 : arg2;
+  const options: InvoicePdfOptions | undefined =
+    optionsCandidate && typeof optionsCandidate === "object" ? (optionsCandidate as InvoicePdfOptions) : undefined;
 
   const invoice: InvoicePdfData = isClientOrderCall
     ? (() => {
@@ -214,15 +240,15 @@ export async function generateInvoicePDF(arg1: unknown, arg2?: unknown, arg3?: u
         const order = arg2 as Order;
         return {
           invoiceNumber: order.orderNumber,
-          createdAt: (order as any).createdAt,
-          clientCIN: (client as any).cin,
+          createdAt: order.createdAt,
+          clientCIN: client.cin,
           client: {
             name: client.name,
-            email: (client as any).email,
-            phone: (client as any).phone,
-            location: (client as any).location,
+            email: client.email,
+            phone: client.phone,
+            location: client.location,
           },
-          items: (order.items ?? []).map((item: any) => ({
+          items: (order.items ?? []).map((item) => ({
             id: item.id,
             productId: item.productId,
             description: item.description,
@@ -230,17 +256,19 @@ export async function generateInvoicePDF(arg1: unknown, arg2?: unknown, arg3?: u
             unitPrice: Number(item.unitPrice ?? 0),
             totalPrice: Number(item.totalPrice ?? 0),
           })),
-          subtotal: (order as any).subtotal,
-          taxRate: (order as any).taxRate,
-          taxAmount: (order as any).taxAmount,
-          totalAmount: Number((order as any).totalAmount ?? 0),
+          subtotal: order.subtotal,
+          taxRate: order.taxRate,
+          taxAmount: order.taxAmount,
+          totalAmount: Number(order.totalAmount ?? 0),
           notes: undefined,
         } satisfies InvoicePdfData;
       })()
     : (arg1 as InvoicePdfData);
 
   const [{ jsPDF }, autoTableModule] = await Promise.all([import("jspdf"), import("jspdf-autotable")]);
-  const autoTable = (autoTableModule as any).default as (doc: any, options: any) => void;
+  const autoTable = (autoTableModule as {
+    default: (doc: JsPdfDoc, options: AutoTableUserOptions) => void;
+  }).default;
 
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const pageWidth = doc.internal.pageSize.getWidth();
@@ -262,8 +290,24 @@ export async function generateInvoicePDF(arg1: unknown, arg2?: unknown, arg3?: u
 
   if (logoDataUrl) {
     try {
-      const logoSize = 18;
-      doc.addImage(logoDataUrl, "PNG", pageWidth - marginX - logoSize, 5, logoSize, logoSize);
+      const logoMaxH = 20;
+      const logoMaxW = 34;
+      const aspectRatio = await getImageAspectRatio(logoDataUrl);
+
+      let logoW = logoMaxH;
+      let logoH = logoMaxH;
+
+      if (aspectRatio) {
+        logoW = logoMaxH * aspectRatio;
+        logoH = logoMaxH;
+
+        if (logoW > logoMaxW) {
+          logoW = logoMaxW;
+          logoH = logoMaxW / aspectRatio;
+        }
+      }
+
+      doc.addImage(logoDataUrl, "PNG", pageWidth - marginX - logoW, 5, logoW, logoH);
     } catch {
       // ignore logo failures
     }
@@ -427,8 +471,9 @@ export async function generateInvoicePDF(arg1: unknown, arg2?: unknown, arg3?: u
     margin: { left: marginX, right: marginX },
   });
 
-  const afterTableY = (doc as any).lastAutoTable?.finalY ?? tableStartY;
-  let totalsY = afterTableY + 10;
+  type AutoTableDoc = JsPdfDoc & { lastAutoTable?: { finalY?: number } };
+  const afterTableY = (doc as AutoTableDoc).lastAutoTable?.finalY ?? tableStartY;
+  const totalsY = afterTableY + 10;
 
   // Totals area (right aligned, no border box)
   const boxWidth = 70;
