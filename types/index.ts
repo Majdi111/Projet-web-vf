@@ -1,3 +1,5 @@
+
+//-------client-------// 
 export interface Client {
   id: string;
   cin: string; // Unique identifier
@@ -10,15 +12,16 @@ export interface Client {
   updatedAt: Date;
 }
 
+//--------order--------//
 export interface Order {
   id: string;
   clientId: string;
   clientCIN: string;
   clientName: string;
-  orderNumber: string;
+  orderNumber: string;  
   items: OrderItem[];
   subtotal: number; // Add subtotal before tax
-  taxRate: number; // Store tax rate (e.g., 0.0752)
+  taxRate: number; // Store tax rate 
   taxAmount: number; // Calculated tax
   totalAmount: number; // Final total with tax
   status: "Pending" | "Processing" | "Completed" | "Cancelled";
@@ -27,18 +30,21 @@ export interface Order {
   invoiceId?: string;
 }
 
+
+//--------orderItem--------//
 export interface OrderItem {
   id: string;
   productId?: string;
   reference?: string;
-  description: string; // Changed from 'name' to match your form
+  description: string; 
   quantity: number;
   unitPrice: number;
   totalPrice: number;
 }
 
+//----------Invoice----------//
 export interface Invoice {
-  id: string;
+  id?: string;
   invoiceNumber: string;
   orderId: string;
   clientId: string;
@@ -60,4 +66,18 @@ export interface Invoice {
   notes?: string;
   createdAt: Date;
   updatedAt: Date;
+}
+
+
+//----------Product----------//
+export interface Product {
+  id: string;
+  reference?: string;
+  name: string;
+  price: number;
+  stock: number;
+  description?: string;
+  category?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }

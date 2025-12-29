@@ -68,8 +68,8 @@ export default function SettingsPage() {
   const validatePhoneNumbers = (): boolean => {
     const nonEmptyPhones = phoneNumbers.filter(p => p.trim());
     for (const phone of nonEmptyPhones) {
-      if (phone.length < 6) {
-        setValidationError("Phone numbers must be at least 6 digits");
+      if (phone.length < 8) {
+        setValidationError("Phone numbers must be at least 8 digits");
         return false;
       }
     }

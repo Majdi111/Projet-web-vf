@@ -26,16 +26,22 @@ export async function addClient(client: Omit<Client, "id" | "createdAt" | "updat
 }
 
 // Fetch all clients from the database
-// Converts Firestore Timestamp objects to JavaScript Date objects
 export async function getClients(): Promise<Client[]> {
   const querySnapshot = await getDocs(collection(db, "clients"));
   return querySnapshot.docs.map(doc => ({
     id: doc.id,
     ...doc.data(),
-    createdAt: doc.data().createdAt?.toDate(),
-    updatedAt: doc.data().updatedAt?.toDate(),
+    createdAt: doc.data().createdAt?.toDate(),// Convert Firestore Timestamp to JS Date
+    updatedAt: doc.data().updatedAt?.toDate(),// Convert Firestore Timestamp to JS Date
   })) as Client[];
 }
+
+// Delete a client from the database
+export const deleteClient = async (clientId: string) => {
+  const clientRef = doc(db, "clients", clientId);
+  await deleteDoc(clientRef);
+};
+
 
 // ============ ORDER SERVICES ============
 
@@ -109,21 +115,52 @@ export const getInvoices = async () => {
   }));
 };
 
-// Fetch a specific client by their ID
-export const getClientById = async (clientId: string) => {
-  const clientRef = doc(db, "clients", clientId);
-  const clientDoc = await getDoc(clientRef);
-  
-  if (!clientDoc.exists()) return null;
-  
-  return {
-    id: clientDoc.id,
-    ...clientDoc.data(),
-  };
-};
+
 
 // Delete an invoice from the database
 export const deleteInvoice = async (invoiceId: string) => {
   const invoiceRef = doc(db, "invoices", invoiceId);
   await deleteDoc(invoiceRef);
+};
+
+// ============ PRODUCT SERVICES ============
+
+// Create a new product in the database
+export async function addProduct(productData: DocumentData) {
+  try {
+    const productsRef = collection(db, "products");
+    const docRef = await addDoc(productsRef, {
+      ...productData,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
+    return docRef.id;
+  } catch (error) {
+    console.error("Error adding product:", error);
+    throw error;
+  }
+}
+
+// Fetch all products from the database
+export async function getProducts() {
+  const querySnapshot = await getDocs(collection(db, "products"));
+  return querySnapshot.docs.map(doc => ({ 
+    id: doc.id,
+    ...doc.data(),
+  }));
+}
+
+// Delete a product from the database
+export const deleteProduct = async (productId: string) => {
+  const productRef = doc(db, "products", productId);
+  await deleteDoc(productRef);
+};
+
+// Update a product in the database
+export const updateProduct = async (productId: string, productData: DocumentData) => {
+  const productRef = doc(db, "products", productId);
+  await updateDoc(productRef, {
+    ...productData,
+    updatedAt: serverTimestamp(),
+  });
 };

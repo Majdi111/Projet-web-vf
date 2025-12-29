@@ -20,7 +20,6 @@ import { hoverCard, hoverTransition } from "@/lib/motion"
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebaseClient';
 
-// Sample revenue data for charts
 const revenueData = [
   { name: "Jan", revenue: 13000 },
   { name: "Feb", revenue: 15000 },
@@ -57,7 +56,7 @@ const defaultStatsData = [
     trend: "up"
   },
   { 
-    title: "Active Clients", 
+    title: "Total Clients", 
     value: "0", 
     subtitle: "+0 new this month", 
     icon: Users,
@@ -82,7 +81,6 @@ const defaultStatsData = [
   },
 ]
 
-// Animated counter component with smooth number transitions
 function AnimatedCounter({ 
   value, 
   duration = 2 
@@ -244,7 +242,7 @@ function RevenueChart() {
   )
 }
 
-// Invoice Status Chart Component
+
 function InvoiceStatusChart() {
   return (
     <motion.div
@@ -319,7 +317,7 @@ function InvoiceStatusChart() {
   )
 }
 
-// Sales vs Purchases Chart Component
+
 function SalesVsPurchasesChart() {
   return (
     <motion.div
@@ -384,7 +382,7 @@ function SalesVsPurchasesChart() {
   )
 }
 
-// Dashboard Header Component
+
 function DashboardHeader() {
   return (
     <motion.div
@@ -406,7 +404,6 @@ function DashboardHeader() {
   )
 }
 
-// Loading Screen Component
 function LoadingScreen() {
   return (
     <motion.div
@@ -512,7 +509,7 @@ export default function DashboardPage() {
             trend: "up"
           },
           { 
-            title: "Active Clients", 
+            title: "Total Clients", 
             value: clientsCount.toString(), 
             subtitle: "+8 new this month", 
             icon: Users,

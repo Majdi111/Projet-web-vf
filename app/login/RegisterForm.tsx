@@ -30,7 +30,7 @@ export default function RegisterForm({ onSwitch }: { onSwitch: (type: AuthFormTy
 
   const showMessage = (type: "success" | "error", text: string) => {
     setMessage({ type, text })
-    setTimeout(() => setMessage(null), 4500) // auto-hide after 4.5s
+    setTimeout(() => setMessage(null), 4500)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -84,7 +84,6 @@ export default function RegisterForm({ onSwitch }: { onSwitch: (type: AuthFormTy
       <h2 className="text-2xl font-semibold">Create Account</h2>
       <p className="text-sm text-gray-400 mt-1">Fill in your details to sign up</p>
 
-      {/*  Animated message box (smooth fade, glow, and lift) */}
       <AnimatePresence mode="wait">
         {message && (
           <motion.div

@@ -50,6 +50,7 @@ import {
   increment
 } from 'firebase/firestore';
 import { db } from '@/lib/firebaseClient';
+import { deleteClient } from '@/services/firebaseService';
 import { generateInvoicePDF } from "@/app/utils/generateInvoice";
 
 // ========== TYPE DEFINITIONS ==========
@@ -222,7 +223,7 @@ export default function ClientsPage() {
   const confirmDeleteClient = async () => {
     try {
       setDeletingClientId(deleteDialogState.clientId);
-      await deleteDoc(doc(db, 'clients', deleteDialogState.clientId));
+      await deleteClient(deleteDialogState.clientId);
       setClients(clients.filter(c => c.id !== deleteDialogState.clientId));
       setDeleteDialogState({ isOpen: false, clientId: "", clientName: "" });
       setNotification({

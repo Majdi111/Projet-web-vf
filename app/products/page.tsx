@@ -13,11 +13,12 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '@/lib/firebaseClient';
+import { deleteProduct, getProducts } from '@/services/firebaseService';
 import AddProductDialog from "./add-product-form/AddProductDialog";
 import EditProductDialog from "./edit-product-form/EditProductDialog";
 import DeleteProductDialog from "./delete-product-dialog/DeleteProductDialog";
 
-// Format price in Tunisian Dinar
+
 function formatPriceDT(value: number) {
   return `${value}dt`;
 }
@@ -409,15 +410,8 @@ export default function ProductsPage() {
       setLoading(true);
       setError(null);
       
-      const productsCollection = collection(db, 'products');
-      const productsSnapshot = await getDocs(productsCollection);
-      
-      const productsData = productsSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as Product[];
-      
-      setProducts(productsData);
+      const productsData = await getProducts();
+      setProducts(productsData as Product[]);
     } catch (err) {
       console.error('Error fetching products:', err);
       setError('Failed to load products. Please try again.');
@@ -448,7 +442,7 @@ export default function ProductsPage() {
   // Execute product deletion after confirmation
   const confirmDeleteProduct = async () => {
     try {
-      await deleteDoc(doc(db, 'products', deleteDialogState.productId));
+      await deleteProduct(deleteDialogState.productId);
       setProducts(products.filter(p => p.id !== deleteDialogState.productId));
       setDeleteDialogState({ isOpen: false, productId: "", productName: "" });
     } catch (err) {

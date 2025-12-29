@@ -43,6 +43,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             mounted && !isSidebarCollapsed ? "lg:ml-64" : ""
           }`}
         >
+          {/* Top Bar */}
           <TopBar
             searchValue={searchValue}
             onSearchChange={setSearchValue}
@@ -53,7 +54,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <main className="flex-1 p-4 md:p-6 overflow-auto bg-gradient-to-br from-background via-background to-muted/20">
             <div className="max-w-7xl mx-auto">{children}</div>
           </main>
-
+                  
+          {/* Footer */}
+          
           <footer className="px-6 py-4 mt-auto border-t border-border/40 bg-background/50 backdrop-blur-sm">
             <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
               <p className="text-sm text-muted-foreground">

@@ -8,8 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from '@/lib/firebaseClient';
+import { addProduct } from "@/services/firebaseService";
 import { motion } from "framer-motion";
 import { hoverTransition } from "@/lib/motion";
 
@@ -129,8 +128,7 @@ export default function AddProductDialog({
 
     setLoading(true);
     try {
-      const productsRef = collection(db, 'products');
-      await addDoc(productsRef, {
+      await addProduct({
         reference: formData.reference,
         name: formData.name,
         description: formData.description,
@@ -141,8 +139,6 @@ export default function AddProductDialog({
         status: formData.status,
         sales: formData.sales === "" ? 0 : formData.sales,
         image: formData.image,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
       });
       
       // Reset form

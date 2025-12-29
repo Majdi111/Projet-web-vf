@@ -27,8 +27,6 @@ export default function LoginForm({ onSwitch }: { onSwitch: (type: AuthFormType)
     try {
       await signInWithEmailAndPassword(auth, email, password)
       showMessage("success", "Login successful. Redirecting to your dashboard…")
-
-      // Replace so browser Back won't return to login page after successful auth.
       router.replace("/dashboard")
     } catch (err: unknown) {
       let text = "An unexpected error occurred. Please try again later."
@@ -59,8 +57,6 @@ export default function LoginForm({ onSwitch }: { onSwitch: (type: AuthFormType)
 
   return (
     <div className="relative w-full">
-       
-      {/* Message stays INSIDE panel */}
       <AnimatePresence>
         {message && (
           <motion.div
@@ -79,11 +75,9 @@ export default function LoginForm({ onSwitch }: { onSwitch: (type: AuthFormType)
         )}
       </AnimatePresence>
 
-      {/* Title */}
       <h2 className="text-2xl font-semibold">Login</h2>
       <p className="text-sm text-gray-400 mt-1">Enter your credentials to log in</p>
 
-      {/* Form */}
       <form onSubmit={handleSubmit} className="mt-6 space-y-5">
         {["email", "password"].map((field) => (
           <motion.div
@@ -120,7 +114,6 @@ export default function LoginForm({ onSwitch }: { onSwitch: (type: AuthFormType)
             </label>
           </motion.div>
         ))}
-        {/* Forgot Password Link */}
         <div className="text-right">
           <button
             type="button"
