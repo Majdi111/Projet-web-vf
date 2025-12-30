@@ -59,7 +59,7 @@ export default function SettingsPage() {
       // ignore malformed stored profile
     }
     // run once
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    
   }, []);
 
   // ========== VALIDATION ==========

@@ -1,7 +1,3 @@
-/**
- * @module DashboardCard.tsx
- * @description Reusable dashboard card component for displaying metrics and statistics with hover animations.
- */
 
 "use client"
 

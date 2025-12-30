@@ -21,7 +21,7 @@ export interface Order {
   orderNumber: string;  
   items: OrderItem[];
   subtotal: number; // Add subtotal before tax
-  taxRate: number; // Store tax rate 
+  taxRate: number; // Store tax rate (19%)
   taxAmount: number; // Calculated tax
   totalAmount: number; // Final total with tax
   status: "Pending" | "Processing" | "Completed" | "Cancelled";

@@ -106,7 +106,7 @@ function ProductImage({
   );
 }
 
-// Statistics card with animated counter and hover effects
+
 function StatsCard({ 
   title, 
   value, 
@@ -384,7 +384,7 @@ function ProductCard({ product, index, onEdit, onDelete }: { product: Product; i
   );
 }
 
-// Main products page with grid/table views and filtering
+
 export default function ProductsPage() {
   // ========== STATE MANAGEMENT ==========
   

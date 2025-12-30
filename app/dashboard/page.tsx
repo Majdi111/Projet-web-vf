@@ -116,7 +116,7 @@ function AnimatedCounter({
   return <span ref={displayRef}>0</span>
 }
 
-// Statistics card with icon and trend indicator
+
 function StatsCard({ card, index }: { card: typeof defaultStatsData[0], index: number }) {
   return (
     <motion.div

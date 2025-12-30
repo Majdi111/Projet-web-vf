@@ -12,10 +12,10 @@ export default function ForgotPasswordForm({ onSwitch }: { onSwitch: (type: Auth
   const [focused, setFocused] = useState(false)
 
   const isActive = focused || email !== ""
-
+  
   const handleReset = async (e: React.FormEvent) => {
-    e.preventDefault()
-    try {
+  e.preventDefault()
+  try {
     const cleanEmail = email.trim().toLowerCase();
     const methods = await fetchSignInMethodsForEmail(auth, cleanEmail);
 
@@ -30,7 +30,8 @@ export default function ForgotPasswordForm({ onSwitch }: { onSwitch: (type: Auth
     console.error(err)
     alert("Something went wrong. Please try again.")
   }
-  }
+}
+
 
   return (
     <div>

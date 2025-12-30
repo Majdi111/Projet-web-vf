@@ -23,7 +23,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"; // ✅ NEW IMPORT
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"; 
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -539,7 +539,7 @@ export default function InvoicesPage() {
         </div>
       )}
 
-      {/* Table View - SAME AS BEFORE */}
+      {/* Table View */}
       {viewMode === "table" && (
         <motion.div 
           initial={{ opacity: 0 }} 
@@ -714,7 +714,7 @@ export default function InvoicesPage() {
                 Are you sure you want to delete invoice <span className="font-semibold text-foreground">{deleteDialogState.invoiceNumber}</span>?
               </p>
               <p className="text-xs text-destructive/70">
-                ⚠️ This action cannot be undone.
+                 This action cannot be undone.
               </p>
             </div>
 

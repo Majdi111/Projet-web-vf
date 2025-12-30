@@ -338,7 +338,7 @@ export default function ClientsPage() {
       const dueDate = new Date();
       dueDate.setDate(dueDate.getDate() + 30);
 
-      // Use order's existing tax values to avoid recalculation
+      
       const taxRate = order.taxRate ?? 0;
       const taxAmount = order.taxAmount ?? 0;
       const subtotal = order.subtotal ?? 0;
@@ -465,7 +465,7 @@ export default function ClientsPage() {
     return result.sort((a, b) => {
       const aPending = (a.pendingOrdersCount || 0) > 0 ? 1 : 0;
       const bPending = (b.pendingOrdersCount || 0) > 0 ? 1 : 0;
-      return bPending - aPending; // 1s first, 0s last
+      return bPending - aPending;
     });
   })();
 

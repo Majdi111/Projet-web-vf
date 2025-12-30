@@ -1,4 +1,3 @@
-// firebaseService.ts
 // Firebase database service functions for managing clients, orders, and invoices
 import { db } from "../lib/firebaseClient";
 import { Client, Order } from "../types/index";
